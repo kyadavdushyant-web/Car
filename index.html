@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Car Dodge Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{
+  margin:0;
+  background:#111;
+  color:#fff;
+  text-align:center;
+  font-family:Arial;
+}
+#road{
+  width:300px;
+  height:500px;
+  background:#333;
+  margin:20px auto;
+  position:relative;
+  overflow:hidden;
+  border:3px solid white;
+}
+#player{
+  width:50px;
+  height:80px;
+  background:red;
+  position:absolute;
+  bottom:10px;
+  left:125px;
+  border-radius:5px;
+}
+.enemy{
+  width:50px;
+  height:80px;
+  background:yellow;
+  position:absolute;
+  top:-100px;
+  border-radius:5px;
+}
+button{
+  padding:10px 20px;
+  font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🚗 Car Dodge Game</h2>
+<p>Score: <span id="score">0</span></p>
+
+<div id="road">
+  <div id="player"></div>
+</div>
+
+<button onclick="startGame()">Start</button>
+
+<script>
+let player = document.getElementById("player");
+let road = document.getElementById("road");
+let scoreText = document.getElementById("score");
+let score = 0;
+let speed = 3;
+let gameInterval, enemyInterval;
+
+document.addEventListener("keydown", e=>{
+  let left = player.offsetLeft;
+  if(e.key=="ArrowLeft" && left>0) player.style.left = left-20+"px";
+  if(e.key=="ArrowRight" && left<250) player.style.left = left+20+"px";
+});
+
+road.addEventListener("touchstart", e=>{
+  let x = e.touches[0].clientX;
+  let roadX = road.getBoundingClientRect().left;
+  if(x < roadX+150 && player.offsetLeft>0)
+    player.style.left = player.offsetLeft-40+"px";
+  else if(player.offsetLeft<250)
+    player.style.left = player.offsetLeft+40+"px";
+});
+
+function createEnemy(){
+  let enemy = document.createElement("div");
+  enemy.className = "enemy";
+  enemy.style.left = Math.floor(Math.random()*250)+"px";
+  road.appendChild(enemy);
+
+  let move = setInterval(()=>{
+    let top = enemy.offsetTop;
+    enemy.style.top = top + speed + "px";
+
+    if(top > 500){
+      score++;
+      scoreText.innerText = score;
+      enemy.remove();
+      clearInterval(move);
+    }
+
+    if(
+      enemy.offsetTop + 80 > player.offsetTop &&
+      enemy.offsetLeft < player.offsetLeft + 50 &&
+      enemy.offsetLeft + 50 > player.offsetLeft
+    ){
+      clearInterval(gameInterval);
+      clearInterval(enemyInterval);
+      alert("Game Over! Score: "+score);
+      location.reload();
+    }
+  },20);
+}
+
+function startGame(){
+  score=0;
+  speed=3;
+  scoreText.innerText=0;
+
+  enemyInterval = setInterval(()=>{
+    createEnemy();
+    speed += 0.2;
+  },1200);
+}
+</script>
+
+</body>
+                              </html>
